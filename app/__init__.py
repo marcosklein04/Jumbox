@@ -3,6 +3,7 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 
+
 bcrypt = Bcrypt()
 
 def create_app():

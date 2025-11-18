@@ -2,49 +2,86 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Tus estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <title>Mis Compras</title>
 </head>
 <body>
-    <header class="main-header">
-        <div class="logo">
-            <a href="{{ url_for('main.home') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Jumbox">
-            </a>
-        </div>
-        <div class="titulo-header">
-            <h1>Mis Compras</h1>
-        </div>
-        <div class="cuenta" tabindex="0">
-            <div class="cuenta-btn">
-                <i class="fa-solid fa-user"></i> 
-                <span>{{ session.get('nombre', 'Usuario') }}</span> 
-                <i class="fa-solid fa-chevron-down"></i>
+
+    <!-- ===========================
+         HEADER RESPONSIVE
+    ============================ -->
+    <header class="main-header container-fluid">
+        <div class="row align-items-center w-100">
+
+            <!-- LOGO -->
+            <div class="col-6 col-md-3 d-flex align-items-center">
+                <a href="{{ url_for('main.home') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Jumbox" class="img-fluid" style="max-width:110px;">
+                </a>
             </div>
-            <ul class="menu-cuenta" aria-hidden="true">
-                <li><a href="{{ url_for('user.mis_compras') }}">Mis Compras</a></li>
-                <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
-            </ul>
+
+            <!-- TÍTULO -->
+            <div class="col-12 col-md-6 mt-3 mt-md-0 text-center">
+                <div class="titulo-header">
+                    <h1 class="m-0">Mis Compras</h1>
+                </div>
+            </div>
+
+            <!-- CUENTA -->
+            <div class="col-6 col-md-3 mt-3 mt-md-0 text-end">
+                <div class="cuenta d-inline-block" tabindex="0">
+                    <div class="cuenta-btn">
+                        <i class="fa-solid fa-user"></i> 
+                        <span>{{ session.get('nombre', 'Usuario') }}</span> 
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <ul class="menu-cuenta" aria-hidden="true">
+                        <li><a href="{{ url_for('user.mis_compras') }}">Mis Compras</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </header>
 
-    <main>
+    <!-- ===========================
+         MENSAJES FLASH
+    ============================ -->
+    <div class="container mt-3">
         <div class="mensajes-flash">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert {{ category }}">{{ message }}</div>
+                        <div class="alert {{ category }} w-100">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
         </div>
+    </div>
 
+    <!-- ===========================
+         CONTENIDO PRINCIPAL
+    ============================ -->
+    <main class="container py-4">
         <div class="compras-container">
+
             <!-- Sección de Dirección -->
-            <div class="direccion-section">
+            <div class="direccion-section mb-4">
                 <div class="card-direccion">
                     <h2><i class="fa-solid fa-location-dot"></i> Mi Dirección de Envío</h2>
                     
@@ -63,7 +100,7 @@
                         </div>
                     </div>
 
-                    <button class="btn-editar-direccion" onclick="toggleEditarDireccion()">
+                    <button class="btn-editar-direccion mt-2" onclick="toggleEditarDireccion()">
                         <i class="fa-solid fa-pen-to-square"></i> Editar Dirección
                     </button>
 
@@ -92,7 +129,7 @@
             </div>
 
             <!-- Sección de Historial de Compras -->
-            <div class="historial-section">
+            <div class="historial-section mb-4">
                 <h2><i class="fa-solid fa-shopping-bag"></i> Historial de Compras</h2>
                 
                 {% if pedidos %}
@@ -143,32 +180,36 @@
 
                             <div class="pedido-detalles" id="detalles-{{ pedido['id_pedido'] }}" style="display: none;">
                                 <h4>Productos del pedido:</h4>
-                                <table class="tabla-productos-pedido">
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th class="center">Cantidad</th>
-                                            <th class="right">Precio Unit.</th>
-                                            <th class="right">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for producto in pedido['productos'] %}
-                                        <tr>
-                                            <td>{{ producto['nombre'] }}</td>
-                                            <td class="center">{{ producto['cantidad'] }}</td>
-                                            <td class="right">${{ "%.2f"|format(producto['precio']) }}</td>
-                                            <td class="right">${{ "%.2f"|format(producto['subtotal']) }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="right"><strong>Total:</strong></td>
-                                            <td class="right total-pedido"><strong>${{ "%.2f"|format(pedido['total']) }}</strong></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+
+                                <div class="tabla-wrapper">
+                                    <table class="tabla-productos-pedido">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th class="center">Cantidad</th>
+                                                <th class="right">Precio Unit.</th>
+                                                <th class="right">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for producto in pedido['productos'] %}
+                                            <tr>
+                                                <td>{{ producto['nombre'] }}</td>
+                                                <td class="center">{{ producto['cantidad'] }}</td>
+                                                <td class="right">${{ "%.2f"|format(producto['precio']) }}</td>
+                                                <td class="right">${{ "%.2f"|format(producto['subtotal']) }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3" class="right"><strong>Total:</strong></td>
+                                                <td class="right total-pedido"><strong>${{ "%.2f"|format(pedido['total']) }}</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
                             </div>
                         </div>
                         {% endfor %}
@@ -185,11 +226,12 @@
             </div>
 
             <!-- Botón Volver -->
-            <div class="acciones-footer">
+            <div class="acciones-footer mb-4">
                 <a href="{{ url_for('main.home') }}" class="btn-volver">
                     <i class="fa-solid fa-arrow-left"></i> Volver a la Tienda
                 </a>
             </div>
+
         </div>
     </main>
 
@@ -197,10 +239,13 @@
         <p>© 2025 Jumbox. Todos los derechos reservados.</p>
     </footer>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         function toggleEditarDireccion() {
             const form = document.getElementById('formEditarDireccion');
-            if (form.style.display === 'none') {
+            if (form.style.display === 'none' || form.style.display === '') {
                 form.style.display = 'block';
             } else {
                 form.style.display = 'none';
@@ -211,7 +256,7 @@
             const detalles = document.getElementById('detalles-' + pedidoId);
             const icon = detalles.previousElementSibling.querySelector('.pedido-toggle i');
             
-            if (detalles.style.display === 'none') {
+            if (detalles.style.display === 'none' || detalles.style.display === '') {
                 detalles.style.display = 'block';
                 icon.classList.remove('fa-chevron-down');
                 icon.classList.add('fa-chevron-up');
