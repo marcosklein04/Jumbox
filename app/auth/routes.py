@@ -1,23 +1,20 @@
-import os
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import sqlite3
-import bcrypt
-from flask import Flask, flash, redirect, url_for, session, request, render_template
+import os
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from dotenv import load_dotenv
+from app import bcrypt
+from app.utils import get_conn
 
-load_dotenv()  # Cargar variables de .env
+auth_bp = Blueprint('auth', __name__, template_folder='../../templates/auth')
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# Configuración de Google OAuth
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:5000/auth/callback"  # Debe coincidir con la consola de Google
+REDIRECT_URI = "http://127.0.0.1:5000/auth/callback"
 
-# Definir el "Flow" de OAuth
 flow = Flow.from_client_config(
     client_config={
         "web": {
@@ -30,8 +27,7 @@ flow = Flow.from_client_config(
     },
     scopes=[
         "openid",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.profile"
     ],
     redirect_uri=REDIRECT_URI
 )
